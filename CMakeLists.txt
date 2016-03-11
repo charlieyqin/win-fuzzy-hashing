@@ -8,6 +8,12 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 # use unicode
 add_definitions(-D_UNICODE)
 
+# c++ build
+ADD_DEFINITIONS(-TP)
+
+# Disable warning
+ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+
 # add head files
 file(GLOB_RECURSE win_fuzzy_hashing_lib_head_files "./win_fuzzy_hashing/include/*.h")
 
@@ -30,5 +36,5 @@ endif()
 aux_source_directory("./win_fuzzy_hashing_unittest/src" win_fuzzy_hashing_unittest_src_files)
 file(GLOB_RECURSE win_fuzzy_hashing_unittest_include_files "./win_fuzzy_hashing_unittest/include/*.h")
 add_executable(win_fuzzy_hashing_unittest ${win_fuzzy_hashing_unittest_src_files} ${win_fuzzy_hashing_unittest_include_files} ${gtest_lib_head_files})
-# target_link_libraries(win_fuzzy_hashing_unittest win_fuzzy_hashing)
+target_link_libraries(win_fuzzy_hashing_unittest win_fuzzy_hashing)
 target_link_libraries(win_fuzzy_hashing_unittest gtest)

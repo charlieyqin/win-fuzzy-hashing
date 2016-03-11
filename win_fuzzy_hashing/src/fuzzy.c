@@ -22,7 +22,7 @@
  *     http://ssdeep.sf.net/
  */
 
-#include "main.h"
+//#include "main.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -31,9 +31,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <cstdio>
+#include <windows.h>
 
-#include "fuzzy.h"
-#include "edit_dist.h"
+#include "../include/fuzzy.h"
+#include "../include/edit_dist.h"
 
 #if defined(__GNUC__) && __GNUC__ >= 3
 #define likely(x)       __builtin_expect(!!(x), 1)
@@ -48,6 +51,9 @@
 #define HASH_PRIME 0x01000193
 #define HASH_INIT 0x28021967
 #define NUM_BLOCKHASHES 31
+
+#define MIN(x,y) ((x)<(y)?(x):(y))
+#define MAX(a,b) (((a)>(b))?(a):(b))
 
 struct roll_state {
   unsigned char window[ROLLING_WINDOW];
@@ -134,7 +140,7 @@ struct fuzzy_state
 /*@only@*/ /*@null@*/ struct fuzzy_state *fuzzy_new(void)
 {
   struct fuzzy_state *self;
-  if(NULL == (self = malloc(sizeof(struct fuzzy_state))))
+  if (NULL == (self = (struct fuzzy_state *)malloc(sizeof(struct fuzzy_state))))
     /* malloc sets ENOMEM */
     return NULL;
   self->bhstart = 0;
@@ -154,7 +160,7 @@ struct fuzzy_state
 /*@only@*/ /*@null@*/ struct fuzzy_state *fuzzy_clone(const struct fuzzy_state *state)
 {
   struct fuzzy_state *newstate;
-  if (NULL == (newstate = malloc(sizeof(struct fuzzy_state))))
+  if (NULL == (newstate = (struct fuzzy_state *)malloc(sizeof(struct fuzzy_state))))
     /* malloc sets ENOMEM */
     return NULL;
   memcpy(newstate, state, sizeof(struct fuzzy_state));
@@ -361,7 +367,7 @@ int fuzzy_digest(const struct fuzzy_state *self,
     --bi;
   assert (!(bi > 0 && self->bh[bi].dindex < SPAMSUM_LENGTH / 2));
 
-  i = snprintf(result, (size_t)remain, "%lu:", (unsigned long)SSDEEP_BS(bi));
+  i = _snprintf(result, (size_t)remain, "%lu:", (unsigned long)SSDEEP_BS(bi));
   if (i <= 0)
     /* Maybe snprintf has set errno here? */
     return -1;
@@ -531,15 +537,15 @@ int fuzzy_hash_file(FILE *handle, /*@out@*/ char *result)
   off_t fpos, fposend;
   int status = -1;
   struct fuzzy_state *ctx;
-  fpos = ftello(handle);
+  fpos = ftell(handle);
   if (fpos < 0)
     return -1;
-  if (fseeko(handle, 0, SEEK_END) < 0)
+  if (fseek(handle, 0, SEEK_END) < 0)
     return -1;
-  fposend = ftello(handle);
+  fposend = ftell(handle);
   if (fposend < 0)
     return -1;
-  if (fseeko(handle, 0, SEEK_SET) < 0)
+  if (fseek(handle, 0, SEEK_SET) < 0)
     return -1;
   if (NULL == (ctx = fuzzy_new()))
     return -1;
@@ -551,7 +557,7 @@ int fuzzy_hash_file(FILE *handle, /*@out@*/ char *result)
 out:
   if (status == 0)
   {
-    if (fseeko(handle, fpos, SEEK_SET) < 0)
+    if (fseek(handle, fpos, SEEK_SET) < 0)
       return -1;
   }
   fuzzy_free(ctx);
@@ -642,7 +648,7 @@ static char *eliminate_sequences(const char *str)
   char *ret;
   size_t i, j, len;
 
-  ret = strdup(str);
+  ret = _strdup(str);
   if (!ret)
     return NULL;
 
