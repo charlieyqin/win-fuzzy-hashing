@@ -4,6 +4,8 @@ project (win_fuzzy_hashing)
 # set mt md
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 
 # use unicode
 add_definitions(-D_UNICODE)
@@ -35,6 +37,6 @@ endif()
 
 aux_source_directory("./win_fuzzy_hashing_unittest/src" win_fuzzy_hashing_unittest_src_files)
 file(GLOB_RECURSE win_fuzzy_hashing_unittest_include_files "./win_fuzzy_hashing_unittest/include/*.h")
-add_executable(win_fuzzy_hashing_unittest ${win_fuzzy_hashing_unittest_src_files} ${win_fuzzy_hashing_unittest_include_files} ${gtest_lib_head_files})
+add_executable(win_fuzzy_hashing_unittest ${win_fuzzy_hashing_unittest_src_files} ${win_fuzzy_hashing_unittest_include_files} ${gtest_lib_head_files} ${win_fuzzy_hashing_lib_head_files})
 target_link_libraries(win_fuzzy_hashing_unittest win_fuzzy_hashing)
 target_link_libraries(win_fuzzy_hashing_unittest gtest)
